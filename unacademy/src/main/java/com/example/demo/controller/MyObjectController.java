@@ -33,6 +33,12 @@ public class MyObjectController {
 		return objectService.expire(key,time);
 	}
 	
+	@RequestMapping("/ttl")
+	public long ttl(@RequestParam String key)
+	{
+		return objectService.ttl(key);
+	}
+	
 	@RequestMapping("/delete")
 	public String delete(@RequestParam String key) {
 		objectService.delete(key);

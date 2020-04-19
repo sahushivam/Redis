@@ -46,6 +46,10 @@ public class ObjectService {
 				obj.set(key,p.value);
 				if(p.expiry >  System.currentTimeMillis())
 					return p.value + "from db";
+				else {
+					objectrepository.delete(p);
+					obj.erase(key);
+				}
 			}
 			catch(Exception e)
 			{
@@ -158,8 +162,7 @@ public class ObjectService {
 					}
 				}
 			}
-			
-			
+		
 			
 		}
 		catch(Exception e)

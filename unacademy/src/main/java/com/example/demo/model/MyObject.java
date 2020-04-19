@@ -1,12 +1,9 @@
 package com.example.demo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,6 +11,7 @@ import java.util.TreeSet;
 public class MyObject {
 	@Id
 	public		String		id;
+	@Indexed
 	public 		String	 	key;
 	public		String		value;
 	public 		boolean 	isString;
