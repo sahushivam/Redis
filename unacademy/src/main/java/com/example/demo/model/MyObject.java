@@ -3,44 +3,52 @@ package com.example.demo.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Document
 public class MyObject {
 	@Id
-	public 		String 		id;
-	public 		String	 	key,value;
+	public		String		id;
+	public 		String	 	key;
+	public		String		value;
 	public 		boolean 	isString;
-	public 		int 		expiry;
-//	public static Set<pair<Integer,String> > sorter =new HashSet<MyObject.pair<Integer,String>>();
-//	
-//	public static class pair<first,second>{
-//        public first First;
-//        public second Second;
-//        private pair(first First,second Second){
-//            this.First = First;
-//            this.Second = Second;
-//        }
-//    }
-//	
-//	public void add(Integer score, String value)
-//	{
-//		sorter.add(new pair(score,value));
-//	}
+	public 		long 		expiry;
+	
+	public static class pair{
+        public int First;
+        public String Second;
+        private pair(Integer First, String Second) {
+			// TODO Auto-generated constructor stub
+        	this.First = First;
+        	this.Second = Second;
+		}
+    }
+	public Set<pair> sorter =new TreeSet<MyObject.pair>(new The_Comparator());
 
-	public MyObject(String key,String value,int time)
+	public void add(Integer score, String value)
 	{
+		sorter.add(new pair(score, value));
+	}
+
+	public MyObject(String key,String value)
+	{
+		long DEFAULT = 999999999999999L;
 		this.key = key;
 		this.value = value;
-		this.expiry = time;
+		this.isString = true;
+		this.expiry =  System.currentTimeMillis()+DEFAULT; 
 	}
 	
 	public String getKey() {
 		return key;
 	}
 
-	public int getExpiry() {
+	public long getExpiry() {
 		return expiry;
 	}
 
@@ -61,9 +69,9 @@ public class MyObject {
 		return "Key is" + key + ": value" + value;
 	}
 
-	public void setExpiry(int time) {
+	public void setExpiry(long expiry) {
 		// TODO Auto-generated method stub
-		this.expiry = time;
+		this.expiry = expiry;
 	}
 	
 }

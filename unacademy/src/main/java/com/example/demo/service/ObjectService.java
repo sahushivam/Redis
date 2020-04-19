@@ -1,11 +1,14 @@
 package com.example.demo.service;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Map;
 import com.example.demo.model.MyObject;
+import com.example.demo.model.MyObject.pair;
 import com.example.demo.repository.MyObjectRepository;
 
 @Service
@@ -14,97 +17,173 @@ public class ObjectService {
 	@Autowired
 	private MyObjectRepository	objectrepository;
 	private Map 				obj;
-	private MyObject 			mobj;
 	//Create operation
 	public String set(String key,String value) {
 		obj = Map.getMapObject();
-		int defaultexpire=12;
-		obj.set(key,value,defaultexpire);											// storing in map
-		objectrepository.save(new MyObject(key, value,defaultexpire));		//storing in db
+		try {
+			MyObject p = objectrepository.findByKey(key);
+			p.setValue(value);
+			objectrepository.save(p);
+		}
+		catch(Exception e) {
+			MyObject p= obj.set(key, value);
+			objectrepository.save(p);	
+		}//storing in db
 		return "OK";
 	}
 	
-	public String set(String key, String value, String sec, int time) {
-		if(sec.compareTo("EX")==0)
-		{
-			time = time * 1000;
-			//convert into milliseconds and add now.time() + time
-			obj.set(key, value,time);
-		}
-		else
-		{
-			obj.set(key, value,time);
-		}
-		return "OK";
-	}
 	
 	//Retrieve operation
 	public String get(String key) {
 		//first check in map if found return it, else go to database
-		if(obj.present(key)) {
-			mobj =  obj.get(key);
-			int time_now=10;						//get the time and compare
-			if(mobj.expiry > time_now || mobj.isString == false)
-			{
-				return "nil";			//object not found
+			try {
+				obj = Map.getMapObject();
+				if(obj.present(key))
+				{
+					return obj.get(key).value+" from map ";
+				}
+				MyObject p = objectrepository.findByKey(key);
+				obj.set(key,p.value);
+				if(p.expiry >  System.currentTimeMillis())
+					return p.value + "from db";
 			}
-			else
+			catch(Exception e)
 			{
-				return mobj.value;
+				
 			}
-		}
-		else//also check if it has got expire than delete from map and database
-		{	
-			MyObject mobj = objectrepository.findByKey(key);
-			int time_now=10;			//get the time and compare
-			if(mobj == null || mobj.expiry > time_now || mobj.isString == false)
-			{
-				return "nil";			//object not found
-			}
-			else
-			{
-				obj.set(key,mobj.value,time_now);
-				return mobj.value;
-			}
-		}
+			return "(nil)";
 	}
 
 	//remove item from database
-	public void delete(String firstName) {
-		MyObject p = objectrepository.findByKey(firstName);
-		objectrepository.delete(p);//and also delete from map
+	public void delete(String key) {
+		try {
+			MyObject p = objectrepository.findByKey(key);
+			objectrepository.delete(p);//and also delete from map
+		}
+		catch(Exception e)
+		{
+			System.out.println("Key not present");
+		}
 	}
 
 	//set the expire time
 	public int expire(String key, int time) {
 		// TODO Auto-generated method stub
 		MyObject p = objectrepository.findByKey(key);
-		if(p!=null) {
-			p.setExpiry(time);
+		try {
+			long timestampMillis = System.currentTimeMillis();
+			p.setExpiry(timestampMillis + time);
 			objectrepository.save(p);
-			if(obj.present(key))			//if object present in map
-			{
-				obj.erase(key);
-				obj.set(key,p.value,time);
-			}
 			return 1;
 		}
-		else
+		catch(Exception e)
 		{
-			return 0;
+			System.out.print("Key not found");
 		}
+		return 0;
 	}
 
-	public int ttl(String key) {
+	public long ttl(String key) {
 		// TODO Auto-generated method stub
 		MyObject p = objectrepository.findByKey(key);
-		if(p!=null) {					//expire time - now() =ttl;
-			int exp = p.getExpiry();
-			int now = 1000;						//set the time now
-			return exp - now;
+		try {					//expire time - now() =ttl;
+			long exp = p.getExpiry();
+			long timestampMillis = System.currentTimeMillis();
+			return exp - timestampMillis;
+		}
+		catch(Exception e)
+		{
+			System.out.print("Key not found");
 		}
 		return -1;
 	}
+
+
+	public void deleteAll() {
+		// TODO Auto-generated method stub
+		objectrepository.deleteAll();
+	}
+
+
+	public List<MyObject> getAll() {
+		// TODO Auto-generated method stub
+		return objectrepository.findAll();
+	}
 	
-	//ttl
+	public int zadd(String key, int score, String value) {
+		// TODO Auto-generated method stub
+		obj = Map.getMapObject();
+		try {
+			MyObject p = objectrepository.findByKey(key);
+			if(p.isString == false)
+			{
+				p.add(score, value);			//if exist then add a value
+				objectrepository.save(p);
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		catch(Exception e)
+		{
+			MyObject m = obj.addInSet(key,score,value);
+			objectrepository.save(m);		//storing in db
+			
+		}
+		return 1;
+	}
+	
+	public String zrank(String key, String value) {	//takes O(n) times
+		// TODO Auto-generated method stub
+		obj = Map.getMapObject();
+		try {
+			MyObject p = objectrepository.findByKey(key);
+			if(p.isString == false)
+			{
+				int i=0;
+				for(pair a: p.sorter)
+				{
+					if(a.Second.compareTo(value)==0)
+					{
+						int score = a.First;
+						
+						for(pair j: p.sorter)
+						{
+							if(j.First < score)
+								i++;
+						}
+						return i+"";
+					}
+				}
+			}
+			
+			
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println("Key not found in zrank");
+		}
+		return "(nil)";
+	}
+	
+	public List<String> zrange(String key, int low, int high) {
+		// TODO Auto-generated method stub
+		obj = Map.getMapObject();
+		List<String> l1 = new ArrayList<String>();
+		MyObject p = objectrepository.findByKey(key);
+		if(p!=null && p.isString == false)
+		{
+			for(pair a: p.sorter)
+			{
+				if(a.First >= low && a.First <= high)
+				{
+					l1.add(a.Second);
+				}
+			}
+		}
+		return l1;
+	}
 }
