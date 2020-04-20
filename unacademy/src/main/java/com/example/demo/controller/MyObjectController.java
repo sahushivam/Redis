@@ -66,7 +66,7 @@ public class MyObjectController {
 	}	
 	
 	@RequestMapping("zrange")
-	public List<String> zrange(@RequestParam String key, @RequestParam int low, @RequestParam int high){
+	public List<String> zrange(@RequestParam String key, @RequestParam double low, @RequestParam double high){
 		return objectService.zrange(key,low,high);
 	}
 }

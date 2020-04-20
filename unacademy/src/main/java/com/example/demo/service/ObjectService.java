@@ -40,12 +40,16 @@ public class ObjectService {
 				obj = Map.getMapObject();
 				if(obj.present(key))
 				{
+					if(obj.get(key).isString)
 					return obj.get(key).value+" from map ";
 				}
 				MyObject p = objectrepository.findByKey(key);
-				obj.set(key,p.value);
-				if(p.expiry >  System.currentTimeMillis())
-					return p.value + "from db";
+				if(p.expiry >  System.currentTimeMillis()) {
+					if(p.isString) {
+						obj.set(key,p.value);
+						return p.value + " from db";
+					}
+				}
 				else {
 					objectrepository.delete(p);
 					obj.erase(key);
@@ -114,7 +118,7 @@ public class ObjectService {
 		return objectrepository.findAll();
 	}
 	
-	public int zadd(String key, int score, String value) {
+	public int zadd(String key, double score, String value) {
 		// TODO Auto-generated method stub
 		obj = Map.getMapObject();
 		try {
@@ -149,13 +153,13 @@ public class ObjectService {
 				int i=0;
 				for(pair a: p.sorter)
 				{
-					if(a.Second.compareTo(value)==0)
+					if(a.member.compareTo(value)==0)
 					{
-						int score = a.First;
+						double score = a.score;
 						
 						for(pair j: p.sorter)
 						{
-							if(j.First < score)
+							if(j.score < score)
 								i++;
 						}
 						return i+"";
@@ -172,7 +176,7 @@ public class ObjectService {
 		return "(nil)";
 	}
 	
-	public List<String> zrange(String key, int low, int high) {
+	public List<String> zrange(String key, double low, double high) {
 		// TODO Auto-generated method stub
 		obj = Map.getMapObject();
 		List<String> l1 = new ArrayList<String>();
@@ -181,9 +185,9 @@ public class ObjectService {
 		{
 			for(pair a: p.sorter)
 			{
-				if(a.First >= low && a.First <= high)
+				if(a.score >= low && a.score <= high)
 				{
-					l1.add(a.Second);
+					l1.add(a.member);
 				}
 			}
 		}

@@ -1,0 +1,8 @@
+com/example/demo/UnacademyApplication.class
+com/example/demo/model/MyObject.class
+com/example/demo/model/MyObject$pair.class
+com/example/demo/model/Map.class
+com/example/demo/repository/MyObjectRepository.class
+com/example/demo/model/The_Comparator.class
+com/example/demo/controller/MyObjectController.class
+com/example/demo/service/ObjectService.class
