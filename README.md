@@ -15,10 +15,11 @@
 ## To-Do
 - [x] RESTful Web Service (CRUD)
 - [x] Cache implementation
+- [x] LRU Cache Eviction Policy
 - [ ] Security (Basic Authentication)
 - [ ] Docker
 - [ ] Spring Boot Admin
-- [x] LRU Cache Eviction Policy
+
 
 ## Running the application locally
 There are several ways to run a Spring Boot application on your local machine. One way is to execute the `main` method in the `de.codecentric.springbootsample.Application` class from your IDE.
