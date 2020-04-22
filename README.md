@@ -19,6 +19,7 @@
 - [ ] Security (Basic Authentication)
 - [ ] Docker
 - [ ] Spring Boot Admin
+- [ ] Multithreaded operation(Thread Safe)
 
 
 ## Running the application locally
