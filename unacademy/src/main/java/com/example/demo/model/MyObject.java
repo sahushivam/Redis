@@ -18,17 +18,17 @@ public class MyObject {
 	public 		long 		expiry;
 	
 	public static class pair{
-        public int First;
-        public String Second;
-        private pair(Integer First, String Second) {
+        public double score;
+        public String member;
+        private pair(Double score, String member) {
 			// TODO Auto-generated constructor stub
-        	this.First = First;
-        	this.Second = Second;
+        	this.score = score;
+        	this.member = member;
 		}
     }
 	public Set<pair> sorter =new TreeSet<MyObject.pair>(new The_Comparator());
 
-	public void add(Integer score, String value)
+	public void add(Double score, String value)
 	{
 		sorter.add(new pair(score, value));
 	}

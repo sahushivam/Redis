@@ -47,7 +47,7 @@ public class Map {
 	{
 		this.mp.remove(key);
 	}
-	public MyObject addInSet(String key, int score, String value) {
+	public MyObject addInSet(String key, double score, String value) {
 		// TODO Auto-generated method stub
 		MyObject m = new MyObject(key,value);
 		m.isString = false;
